@@ -2,6 +2,7 @@
     import express from 'express';
     import dotenv from 'dotenv';
     import cors from 'cors';
+    import categoriasRoutes from "./routes/categoriasRoutes.js";
 
     dotenv.config();
 
@@ -18,17 +19,7 @@
     // Configuração para JSON nas requisições
     app.use(express.json());
 
-    // Rota para listar as categorias
-    app.get('/api/categorias', async (request,response) => {
-        
-        //  Busca das categorias no banco de dados
-        const [categorias] = await mySql.query("SELECT * FROM categorias");
-
-        // Retornando as categorias
-        return response.json({
-            categorias
-        });
-    });
+    app.use('/api/categorias',categoriasRoutes)
 
     // Definindo a porta de excução da API e uma função ao iniciar
     app.listen( PORT , () => {
