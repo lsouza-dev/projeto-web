@@ -1,4 +1,4 @@
-import {CriarCategoria, DeletarCategoria, ListarCategorias} from '../controllers/categoriasController.js'
+import {AtualizarCategoria, CriarCategoria, DeletarCategoria, ListarCategorias} from '../controllers/categoriasController.js'
 import { Router } from 'express';
 
 const categoriasRoutes = new Router()
@@ -9,5 +9,7 @@ categoriasRoutes.get('/',ListarCategorias)
 categoriasRoutes.post('/criar',CriarCategoria)
 
 categoriasRoutes.delete('/:id',DeletarCategoria)
+
+categoriasRoutes.put('/:id', AtualizarCategoria)
 
 export default categoriasRoutes;

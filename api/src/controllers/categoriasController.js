@@ -30,4 +30,23 @@ async function DeletarCategoria(request,response){
     })
 }
 
-export { ListarCategorias , CriarCategoria , DeletarCategoria }
+async function AtualizarCategoria(request,response){
+    const {id} = request.params; // Pegando o id da url ( :id  na rota) 
+    const body = request.body; // Pegando o campo de nome do body
+    
+    if(!body.nome){
+        return response.status(400).json({
+            mensagem: "O nome é obrigatório"
+        })
+    }
+
+    const sql = "UPDATE categorias SET nome = ? WHERE id = ?";
+    await mySql.query(sql,[body.nome,id])
+
+    return response.json({
+        mensagem:"A categoria foi atualizada com sucesso!"
+    })
+}
+
+
+export { ListarCategorias , CriarCategoria , DeletarCategoria, AtualizarCategoria }
