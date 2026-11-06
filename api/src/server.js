@@ -3,6 +3,7 @@
     import dotenv from 'dotenv';
     import cors from 'cors';
     import categoriasRoutes from "./routes/categoriasRoutes.js";
+import produtoRouter from "./routes/produtosRoutes.js";
 
     dotenv.config();
 
@@ -20,6 +21,8 @@
     app.use(express.json());
 
     app.use('/api/categorias',categoriasRoutes)
+
+    app.use('/api/produtos',produtoRouter);
 
     // Definindo a porta de excução da API e uma função ao iniciar
     app.listen( PORT , () => {
