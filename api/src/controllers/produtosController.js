@@ -25,7 +25,7 @@ async function CriarProduto(request,response){
     const [categoria] = await mySql.query(categoriaSQL,id_categoria)
 
     if(!categoria[0]){
-        response.status(404).json({
+        return response.status(404).json({
             mensagem: "Categoria não encontrada"
         })
     }
@@ -34,7 +34,7 @@ async function CriarProduto(request,response){
     const [loja] = await mySql.query(lojaSQL,id_loja)
 
     if(!loja[0]){
-        response.status(404).json({
+        return response.status(404).json({
             mensagem: "Loja não encontrada"
         })
     }
@@ -53,4 +53,127 @@ async function CriarProduto(request,response){
     })
 }
 
-export { CriarProduto }
+async function ListarProdutos(request,response){
+
+    const {id} = request.params;
+    const {texto,categoria,qtdMin,qtdMax,precoMin,precoMax} = request.query;
+    let params = [id]
+
+    const lojaSql = "SELECT * FROM lojas WHERE id = ?"
+    const [loja] = await mySql.query(lojaSql,id)
+
+    if(!loja[0]){
+        return response.status(404).json({
+            mensagem:"Loja não encontrada"
+        })
+    }
+
+    let sql = 
+    `SELECT
+        p.id,
+        p.nome,
+        p.descricao,
+        p.preco,
+        p.quantidade,
+        c.id as id_categoria,
+        c.nome as nome_categoria
+    FROM produtos AS p
+    INNER JOIN categorias AS c ON c.id = p.id_categoria
+    WHERE p.id_loja = ?
+    `
+
+    if(texto){
+        sql += "AND (p.descricao LIKE ? OR p.nome LIKE ?)"
+        params.push(`%${texto}%`)
+        params.push(`%${texto}%`)
+    }
+
+    if(categoria){
+        sql += "AND c.nome LIKE ?"
+        params.push(`%${categoria}%`)
+    }
+
+    if(precoMin){
+        sql += "AND p.preco >= ?"
+        params.push(Number(precoMin))
+    }
+
+    if(precoMax){
+        sql += "AND p.preco <= ?"
+        params.push(Number(precoMax))
+    }
+
+    if(qtdMin){
+        sql += "AND p.quantidade >= ? "
+        params.push(Number(qtdMin))
+    }
+
+
+    if(qtdMax){
+        sql += "AND p.quantidade <= ? "
+        params.push(Number(qtdMax))
+    }
+
+    const [produtos] = await mySql.query(sql,params)
+    return response.json({produtos})
+}
+
+async function AtualizarProduto(request,response){
+    const {id} = request.params
+
+    const {
+        nome,
+        descricao,
+        preco,
+        quantidade,
+        id_categoria,
+    } = request.body;
+
+    let campos = []
+    let params = []
+
+    if(id_categoria){
+
+        const categoriaSQL = "SELECT id FROM categorias WHERE id = ?"
+        const [categoria] = await mySql.query(categoriaSQL,id_categoria)
+
+        if(!categoria[0]){
+            return response.status(404).json({
+                mensagem: "Categoria não encontrada"
+            })
+        }
+
+        campos.push("id_categoria = ?")
+        params.push(categoria[0].id)
+
+    }
+
+    if(nome){
+        campos.push("nome = ?")
+        params.push(nome)
+    }
+
+    if(descricao){
+        campos.push("descricao = ?")
+        params.push(descricao)
+    }
+
+    if(preco){
+        campos.push("preco = ?")
+        params.push(Number(preco))
+    }
+
+    if(quantidade){
+        campos.push("quantidade = ?")
+        params.push(Number(quantidade))
+    }
+
+    const sql = `UPDATE produtos SET ${campos.join(',')} WHERE id = ?`
+    await mySql.query(sql,[...params,id])
+
+    return response.json({
+        mensagem:"Produto atualizado com sucesso!"
+    })
+}
+
+export { CriarProduto , ListarProdutos , AtualizarProduto }
