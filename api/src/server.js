@@ -4,6 +4,8 @@
     import cors from 'cors';
     import categoriasRoutes from "./routes/categoriasRoutes.js";
 import produtoRouter from "./routes/produtosRoutes.js";
+import usuarioRouter from "./routes/usuariosRoutes.js";
+import lojasRouter from "./routes/lojasRoutes.js";
 
     dotenv.config();
 
@@ -23,6 +25,10 @@ import produtoRouter from "./routes/produtosRoutes.js";
     app.use('/api/categorias',categoriasRoutes)
 
     app.use('/api/produtos',produtoRouter);
+
+    app.use('/api/usuarios', usuarioRouter)
+
+    app.use('/api/lojas', lojasRouter)
 
     // Definindo a porta de excução da API e uma função ao iniciar
     app.listen( PORT , () => {

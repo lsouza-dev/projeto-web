@@ -138,7 +138,7 @@ async function AtualizarProduto(request,response){
         const [categoria] = await mySql.query(categoriaSQL,id_categoria)
 
         if(!categoria[0]){
-            return response.status(404).json({
+            return  response.status(404).json({
                 mensagem: "Categoria não encontrada"
             })
         }
@@ -176,4 +176,26 @@ async function AtualizarProduto(request,response){
     })
 }
 
-export { CriarProduto , ListarProdutos , AtualizarProduto }
+async function ExcluirProduto(request,response){
+    const {id} = request.params;
+
+    const verificaoSql = "SELECT * FROM produtos WHERE id = ?";
+    const [produto] = await mySql.query(verificaoSql,id)
+    
+    console.log(produto[0])
+
+    if(!produto[0]){
+        return response.status(404).json({
+            mensagem: "Produto não encontrado!"
+        })
+    }
+
+    const exclusaoSql = "DELETE FROM produtos WHERE id = ?"
+    await mySql.query(exclusaoSql,id);
+
+    return response.json({
+        mensagem: "Produto excluído com sucesso!"
+    })
+}
+
+export { CriarProduto , ListarProdutos , AtualizarProduto ,ExcluirProduto }
