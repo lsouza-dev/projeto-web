@@ -1,0 +1,50 @@
+Preciso de um .md de modelo para criar uma aplicação front-end com html,css e javascript apenas. 
+Esse modelo deve ter as informações essenciais para um modelo de IA crar o projeto do 0;
+Temos a seguinte estrutura no projeto: 
+
+banco-de-dados/tabelas.sql
+api/src:
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----        09/11/2026     20:42                controllers
+d-----        03/11/2026     20:30                db
+d-----        09/11/2026     20:42                routes
+-a----        09/11/2026     20:54           1260 server.js
+
+Cada módulo tem ali dentro seus controller e routes. db é apenas para a config, e em server temos as demais configurações e o servidor rodando;
+
+O objetivo desse .md, é ter ali um modelo para o essencial das páginas que precisamos, e as características mais específicas devem ser informadas por quem vai executar o prompt;
+
+
+O que precisamos que tenha em todos os projetos:
+
+Rota index:
+- Exibição do catálogo dos produtos;
+- Na primeira linha de conteúdos, quero que tenham os filtros: inputs,selects, number,etc
+- Filtragem server-side
+- Os produtos devem ser exibidos conforme a sua categoria, ou seja, em cada linha serão exibidos os produtos de uma determinada categoria.
+- A filtragem deve impactar as categorias e produtos exibidos;
+- Quero que os produtos estejam em um grid, adicione arrows nas laterais para fazer o scroll desses produtos para ver os restantes;
+Deve ter um scroll suave
+-Ao fazer o hover em um produto, ele deve ter seu transform y alterado levemente
+- Devemos ter nos cards de produtos algumas informações dele, como a imagem, nome e uma breve descrição com truncate, e o valor
+- Quando clicarmos em um produto, deve abrir um modal com as informações mais detalhadas do produto; Quero que esse modal tenha o conteudo em um grid de 2 colunas, a primeira deve ser ocupada totalmente pela imagem, e a segunda deve ter as demais informações do produto;
+-  Devemos ter a possibilidade de adicionar itens no carrinho ( será feito apenas com as informações armazenadas no navegador )
+- Deixe uma listagem dos produtos no carrinho e também as demais informações necessárias
+- A "compra" deve ser feita no whatsapp, então, faça uma mensagem pronta com as informações do produto e redirecione para o envio de mensagem com as informações como texto. 
+
+Precisamos também de um painel de admin, porém, ele deve ser acessado apenas através de um login;
+
+Devemos ter um login simples, sem recuperação de senha ou cadastro;
+Formulário centralizado na tela e botão de envio;
+
+Já na página de admin, pensei em termos um formato simples de grid;
+
+Algo como 1fr e 4fr, fazendo com que a lateral tenha as informações de quem fez o acesso, quais são os módulos disponíveis e a possibilidade de logout.
+
+Ao selecionar um módulo, deve ser redirecionado para a página do devido recurso. No grid com 4fr, devem ter uma listagem dos registros dessa entidade e as possibilidades de criar, editar e remover. A criação deve ser a partir de um botão no canto direito, que ao apertar, deve aparecer um modal com um formulário para preencher conforme os campos dessa entidade;
+Toda alteração feita nesse módulo deve refletir o que teremos na página inicial, pois é uma alteração dos nossos recursos do banco de dados.
+
+A única coisa que deve ser mantida armazenada no local-storage ou session-storage, são as informações do usuário logado  e o carrinho.
+
+O que acha que falta nesse documento de informações essenciais?? Além disso, seria interessante termos seções nele para especificar o design desejado e coisas desse tipo;

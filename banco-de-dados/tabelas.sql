@@ -32,11 +32,14 @@ CREATE TABLE IF NOT EXISTS produtos (
     preco FLOAT NOT NULL DEFAULT 0,
     quantidade INT NOT NULL DEFAULT 0,
     id_categoria INT NOT NULL,
+    id_loja INT NOT NULL,
 	CONSTRAINT fk_produtos_categorias
     FOREIGN KEY (id_categoria)
-    REFERENCES categorias (id)
+    REFERENCES categorias (id),
+    CONSTRAINT fk_produtos_lojas
+    FOREIGN KEY (id_loja)
+    REFERENCES lojas (id)
 );
-
 
 
 

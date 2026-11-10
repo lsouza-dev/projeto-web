@@ -1,0 +1,2 @@
+Com base no documento PROMPT_MODELO.md estruturado acima, crie o front-end completo para um [Seu Nicho], considerando o WhatsApp [Seu Número] e os módulos de admin [Módulos]. Gere os arquivos index.html, style.css, main.js e as páginas do painel admin.
+Todos os arquivos referentes ao front-end devem estar dentro da pasta na raiz chamada site
