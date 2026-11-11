@@ -1,0 +1,19 @@
+{
+  "liveServer.settings.ignoreFiles": [
+    ".vscode/**",
+    "**/.git/**",
+    "**/api/**",
+    "api/**",
+    "**/uploads/**",
+    "uploads/**",
+    "api/uploads/**",
+    "**/banco-de-dados/**",
+    "**/node_modules/**",
+    "**/*.png",
+    "**/*.jpg",
+    "**/*.jpeg",
+    "**/*.webp",
+    "**/*.gif"
+  ],
+  "liveServer.settings.donotShowInfoMsg": true
+}

@@ -1,0 +1,17 @@
+.vscode/**
+.git/**
+api/**
+uploads/**
+api/uploads/**
+banco-de-dados/**
+node_modules/**
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.webp
+**/*.gif
