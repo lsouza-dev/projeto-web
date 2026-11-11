@@ -2,6 +2,8 @@
     import express from 'express';
     import dotenv from 'dotenv';
     import cors from 'cors';
+    import path from 'path';
+    import { fileURLToPath } from 'url';
     import categoriasRoutes from "./routes/categoriasRoutes.js";
 import produtoRouter from "./routes/produtosRoutes.js";
 import usuarioRouter from "./routes/usuariosRoutes.js";
@@ -9,11 +11,13 @@ import lojasRouter from "./routes/lojasRoutes.js";
 
     dotenv.config();
 
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
     // PORT recebe o valor do .env PORT OU 3333
     const PORT = process.env.PORT || 3333;
 
     // App recebendo o Express
-    // Express é o que usamos para fazer a API com o Javascript
     const app = express(); 
 
     // Configuração de CORS
@@ -21,6 +25,9 @@ import lojasRouter from "./routes/lojasRoutes.js";
 
     // Configuração para JSON nas requisições
     app.use(express.json());
+
+    // Servir arquivos estáticos de upload
+    app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
     app.use('/api/categorias',categoriasRoutes)
 
