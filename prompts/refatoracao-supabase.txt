@@ -1,26 +1,185 @@
-Passaremos agora por um processo de migração de banco de dados;
-Anteriormente, fizemos uma API com Node, utilizando um banco local do MySQL, porém, chegou o momento em que faremos o deploy do app na Vercel, então precisamos de fato ter um banco de dados;
-Temos a seguinte estrutura:
-api/  banco-de-dados/  site/
+# PROMPT MESTRE: Migração Completa de API Node/MySQL para Supabase + Deploy Fullstack na Vercel
 
-Na api, temos tudo referente a de fato nossa construção do backend;
-Em src, temos:
-controllers/  db/  routes/  server.js
+Você é um Arquiteto de Software especialista em Node.js, Express, PostgreSQL/Supabase e arquitetura Serverless na Vercel.
+Sua missão é migrar este projeto que anteriormente rodava com MySQL local para o Supabase (PostgreSQL), preservando integralmente a estrutura da API Express existente (controllers, rotas e regras de negócio) e deixando o repositório 100% pronto para deploy na Vercel (raiz do projeto servindo o front-end estático e a API Serverless).
 
-Previamente, fiz algumas configurações para tentar rodar a api em servelles na vercell, mas, não deu certo.
+---
 
-Devido a esses fatores, quero que o nosso banco de dados seja alterado para o supabase.
-Quero também, que a nossa api seja reutilizada, se possível;
-Não gostaria de remover tudo e usar a api rest do supabase completamente.
+## 1. Estrutura Atual do Repositório
 
-Tenho aqui as envs:
+```text
+projeto-web/
+├── api/
+│   ├── src/
+│   │   ├── controllers/       # Regras e queries (categorias, lojas, produtos, usuarios)
+│   │   ├── db/                # Conexão do banco (anteriormente mysql2)
+│   │   ├── routes/            # Rotas do Express
+│   │   └── server.js          # Configuração do Express e middlewares
+│   ├── index.js               # Ponto de entrada / export para serverless
+│   ├── package.json           # Dependências da API ("type": "module")
+│   └── vercel.json
+├── banco-de-dados/
+│   └── tabelas.sql            # DDL legado do MySQL
+├── site/                      # Front-end estático (Vanilla HTML, CSS, JS)
+│   ├── admin/                 # Painel administrativo (login.html, dashboard.html, admin.js)
+│   ├── index.html             # Catálogo principal
+│   └── main.js
+```
 
-DB_PASSWORD=tWge1qBarD9YqeHc
-SUPABASE_URL=https://lzlgxocaxnbrqysuvqmn.supabase.co
-SUPABASE_PUBLISHABLE_KEY=sb_publishable_0ECBZ10gCquZnbb-q2AQyg_S2kF5i4w
-SUPABASE_SECRET_KEY=sb_secret_0UcV9ZFZEdoOY4maKmNqiw_GZNlo6DB
-SUPABASE_JWKS_URL=https://lzlgxocaxnbrqysuvqmn.supabase.co/auth/v1/.well-known/jwks.json
-SUPABASE_PUBLISHABLE_KEY=sb_publishable_0ECBZ10gCquZnbb-q2AQyg_S2kF5i4w
-SUPABASE_SECRET_KEY=sb_secret_0UcV9ZFZEdoOY4maKmNqiw_GZNlo6DB
+---
 
-analise a estrutura do banco que a api tem consumido, e me ajude a colocar o banco de dados no ar e fazer com que a api consuma ele, e meu app a api;
+## 2. Regras de Ouro e Prevenção de Erros Críticos
+
+Ao executar a migração, você **DEVE OBRIGATORIAMENTE** seguir estas diretrizes para evitar os erros comuns:
+
+### Regra 1: Usar `@supabase/supabase-js` via HTTPS (Nunca conexão TCP direta `pg`/`mysql2`)
+- **Problema:** Instâncias gratuitas do Supabase não fornecem IPv4 público direto (usam apenas IPv6 AAAA no host `db.<ref>.supabase.co`), resultando em `getaddrinfo ENOTFOUND` ou timeout em conexões locais e na Vercel. Além disso, drivers tradicionais que abrem conexão TCP esgotam pools em Serverless.
+- **Solução:** Instalar e usar exclusivamente o cliente oficial `@supabase/supabase-js`. Ele opera sobre HTTPS (porta 443), é imune a bloqueios de rede, não vaza conexões e é nativamente otimizado para Serverless.
+
+### Regra 2: Fallback Inteligente de Chaves de API (`Unregistered API key`)
+- **Problema:** Chaves secretas fornecidas podem ter sido revogadas, digitadas com erro ou pertencer a outro projeto, gerando `401: Unregistered API key`.
+- **Solução:** No arquivo de configuração do Supabase (`api/src/db/config.js`), priorize uma resolução em cadeia para a chave:
+  ```javascript
+  const supabaseKey = process.env.SUPABASE_KEY 
+      || process.env.SUPABASE_PUBLISHABLE_KEY 
+      || process.env.SUPABASE_SECRET_KEY;
+  ```
+
+### Regra 3: Row Level Security (RLS) e Políticas Permissivas (`Error 42501`)
+- **Problema:** No Supabase, o RLS vem ativo por padrão. Se a chave usada na API for do tipo `publishable` / `anon`, qualquer `INSERT`, `UPDATE` ou `DELETE` no painel administrativo falhará com erro `42501: new row violates row-level security policy`.
+- **Solução:** O script SQL de migração DEVE conceder privilégios (`GRANT ALL`) e criar políticas permissivas explícitas (`FOR ALL TO public USING (true) WITH CHECK (true)`).
+
+### Regra 4: Carga Inicial de Dados (Seed Data Obrigatório)
+- **Problema:** Apenas criar as tabelas deixa o banco vazio. O front-end abrirá sem categorias nem produtos, e o login administrativo falhará porque o usuário não existe.
+- **Solução:** O script SQL deve incluir comandos `INSERT ... ON CONFLICT DO UPDATE` com:
+  - 1 Usuário admin padrão (ex: `admin@mostruario.com` / `123456`)
+  - 1 Loja oficial padrão (ID `1`)
+  - Categorias padrão da loja
+  - Produtos de exemplo com preços, estoque e fotos reais (Unsplash)
+  - Sincronização de sequências (`setval(...)`) para que novos cadastros não gerem colisão de ID.
+
+### Regra 5: Extensões `.js` Obrigatórias em Node ESM (`"type": "module"`)
+- **Problema:** O `package.json` da API usa `"type": "module"`. O Node em modo ESM lança `ERR_MODULE_NOT_FOUND` se qualquer import relativo não contiver a extensão `.js` (ex: `import app from "./src/server"` falha; o correto é `import app from "./src/server.js"`).
+
+### Regra 6: Servidor Híbrido (Local + Vercel Serverless)
+- **Problema:** Se `app.listen()` estiver comentado, `npm start` local não roda. Se rodar incondicionalmente, a Vercel pode travar a função serverless esperando a porta fechar.
+- **Solução:** No `api/src/server.js`, envolva o listen na condição:
+  ```javascript
+  if (!process.env.VERCEL) {
+      app.listen(PORT, () => {
+          console.log(`🚀 A API está rodando em http://localhost:${PORT}/api`);
+      });
+  }
+  export default app;
+  ```
+
+### Regra 7: Estrutura Monorepo e Build Automático na Raiz
+- **Problema:** A Vercel executada a partir da raiz do repositório não sabe onde estão os arquivos estáticos nem que deve instalar os pacotes da subpasta `api/`.
+- **Solução:**
+  - Criar um `package.json` na raiz com `"workspaces": ["api"]` e script `"build": "npm install --prefix api"`.
+  - Criar um `vercel.json` na raiz com rewrites para `/api/(.*)` -> `/api/index.js`, `/admin/(.*)` -> `/site/admin/$1` e `/(.*)` -> `/site/$1`.
+
+---
+
+## 3. Plano de Execução Detalhado
+
+### Passo 1: Dependências do Backend
+Dentro da pasta `api`, instalar o client do Supabase e remover dependências antigas do MySQL:
+```powershell
+cd api
+npm install @supabase/supabase-js
+```
+
+### Passo 2: Script SQL do Supabase (`banco-de-dados/supabase_migration.sql`)
+Gerar o script PostgreSQL contendo:
+1. `CREATE TABLE IF NOT EXISTS` para `usuarios`, `categorias`, `lojas`, `produtos` com tipos nativos do Postgres (`BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY`, `NUMERIC(10,2)`, `TEXT`, etc.).
+2. RLS e Políticas:
+   ```sql
+   ALTER TABLE public.usuarios ENABLE ROW LEVEL SECURITY;
+   ALTER TABLE public.categorias ENABLE ROW LEVEL SECURITY;
+   ALTER TABLE public.lojas ENABLE ROW LEVEL SECURITY;
+   ALTER TABLE public.produtos ENABLE ROW LEVEL SECURITY;
+
+   CREATE POLICY "Acesso total usuarios" ON public.usuarios FOR ALL TO public USING (true) WITH CHECK (true);
+   CREATE POLICY "Acesso total categorias" ON public.categorias FOR ALL TO public USING (true) WITH CHECK (true);
+   CREATE POLICY "Acesso total lojas" ON public.lojas FOR ALL TO public USING (true) WITH CHECK (true);
+   CREATE POLICY "Acesso total produtos" ON public.produtos FOR ALL TO public USING (true) WITH CHECK (true);
+
+   GRANT ALL ON ALL TABLES IN SCHEMA public TO postgres, anon, authenticated, service_role;
+   GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO postgres, anon, authenticated, service_role;
+   ```
+3. Carga inicial com `ON CONFLICT DO UPDATE` e sincronização de sequências via `setval(pg_get_serial_sequence(...))`.
+
+### Passo 3: Configuração da Conexão (`api/src/db/config.js`)
+Substituir o pool MySQL pelo client do Supabase:
+```javascript
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY 
+    || process.env.SUPABASE_PUBLISHABLE_KEY 
+    || process.env.SUPABASE_SECRET_KEY;
+
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false, autoRefreshToken: false }
+});
+
+export default supabase;
+```
+
+### Passo 4: Refatoração dos Controllers
+Adaptar cada controller para consumir o Supabase mantendo rigorosamente os **mesmos contratos de resposta JSON** esperados pelo front-end:
+- **`usuariosController.js`**: `supabase.from('usuarios').select('*').ilike('email', email)` para validar login.
+- **`categoriasController.js`**: Listar (`select('*').order('id')`), Criar (`insert`), Atualizar (`update`), Deletar (`delete`).
+- **`lojasController.js`**: Listar todas, buscar por ID e buscar por usuário.
+- **`produtosController.js`**:
+  - Listar com filtros dinâmicos: aplicar `.ilike()` para buscas textuais e categoria, e `.gte()` / `.lte()` para limites numéricos de preço e estoque.
+  - CRUD completo validando integridade referencial antes do `insert` / `update`.
+  - Mapear a resposta para devolver `{ produtos: [...] }` contendo `id`, `nome`, `descricao`, `preco`, `quantidade`, `imagem_url`, `id_categoria` e `nome_categoria`.
+
+### Passo 5: Arquitetura de Deploy Fullstack na Vercel
+1. **`package.json` na raiz**:
+   ```json
+   {
+     "name": "projeto-web",
+     "version": "1.0.0",
+     "private": true,
+     "workspaces": [ "api" ],
+     "scripts": {
+       "install:api": "npm install --prefix api",
+       "build": "npm run install:api",
+       "start": "npm --prefix api start"
+     }
+   }
+   ```
+2. **`vercel.json` na raiz**:
+   ```json
+   {
+     "version": 2,
+     "rewrites": [
+       { "source": "/api/(.*)", "destination": "/api/index.js" },
+       { "source": "/api", "destination": "/api/index.js" },
+       { "source": "/admin", "destination": "/site/admin/login.html" },
+       { "source": "/admin/(.*)", "destination": "/site/admin/$1" },
+       { "source": "/uploads/(.*)", "destination": "/api/uploads/$1" },
+       { "source": "/(.*)", "destination": "/site/$1" }
+     ]
+   }
+   ```
+3. **`.gitignore` na raiz**:
+   Ignorar `node_modules`, `.env`, `api/node_modules` e `api/.env`.
+
+---
+
+## 4. Checklist de Validação Final
+
+Após aplicar as alterações, execute os testes para homologação:
+- [ ] Executar o script SQL no SQL Editor do Supabase Dashboard.
+- [ ] Testar localmente com `npm start` e acessar `http://localhost:3000/api` (Status 200).
+- [ ] Acessar `http://localhost:3000/api/categorias` e `http://localhost:3000/api/produtos/1` garantindo que os dados chegam formatados.
+- [ ] Testar login e CRUD no painel administrativo (`site/admin/login.html`).
+- [ ] Fazer commit e push para o repositório no GitHub.
+- [ ] Importar na Vercel com Root Directory `./` e cadastrar as variáveis `SUPABASE_URL` e `SUPABASE_KEY`.
