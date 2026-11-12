@@ -1,0 +1,26 @@
+Passaremos agora por um processo de migração de banco de dados;
+Anteriormente, fizemos uma API com Node, utilizando um banco local do MySQL, porém, chegou o momento em que faremos o deploy do app na Vercel, então precisamos de fato ter um banco de dados;
+Temos a seguinte estrutura:
+api/  banco-de-dados/  site/
+
+Na api, temos tudo referente a de fato nossa construção do backend;
+Em src, temos:
+controllers/  db/  routes/  server.js
+
+Previamente, fiz algumas configurações para tentar rodar a api em servelles na vercell, mas, não deu certo.
+
+Devido a esses fatores, quero que o nosso banco de dados seja alterado para o supabase.
+Quero também, que a nossa api seja reutilizada, se possível;
+Não gostaria de remover tudo e usar a api rest do supabase completamente.
+
+Tenho aqui as envs:
+
+DB_PASSWORD=tWge1qBarD9YqeHc
+SUPABASE_URL=https://lzlgxocaxnbrqysuvqmn.supabase.co
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_0ECBZ10gCquZnbb-q2AQyg_S2kF5i4w
+SUPABASE_SECRET_KEY=sb_secret_0UcV9ZFZEdoOY4maKmNqiw_GZNlo6DB
+SUPABASE_JWKS_URL=https://lzlgxocaxnbrqysuvqmn.supabase.co/auth/v1/.well-known/jwks.json
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_0ECBZ10gCquZnbb-q2AQyg_S2kF5i4w
+SUPABASE_SECRET_KEY=sb_secret_0UcV9ZFZEdoOY4maKmNqiw_GZNlo6DB
+
+analise a estrutura do banco que a api tem consumido, e me ajude a colocar o banco de dados no ar e fazer com que a api consuma ele, e meu app a api;
