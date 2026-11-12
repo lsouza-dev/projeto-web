@@ -3,14 +3,13 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SECRET_KEY
-    || process.env.SUPABASE_SERVICE_ROLE_KEY
-    || process.env.SUPABASE_PUBLISHABLE_KEY;
+const supabaseUrl = process.env.SUPABASE_URL || 'https://lzlgxocaxnbrqysuvqmn.supabase.co';
 
-if (!supabaseUrl || !supabaseKey) {
-    console.error('ATENÇÃO: Variáveis SUPABASE_URL ou SUPABASE_SECRET_KEY não encontradas!');
-}
+// Prioriza a chave válida registrada para o projeto
+const supabaseKey = process.env.SUPABASE_KEY 
+    || process.env.SUPABASE_PUBLISHABLE_KEY 
+    || process.env.SUPABASE_SECRET_KEY 
+    || 'sb_publishable_0ECBZ10gCquZnbb-q2AQyg_S2kF5i4w';
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
     auth: {
