@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "outputDirectory": "site",
   "rewrites": [
     {
       "source": "/api/(.*)",
@@ -11,20 +12,7 @@
     },
     {
       "source": "/admin",
-      "destination": "/site/admin/login.html"
-    },
-    {
-      "source": "/admin/(.*)",
-      "destination": "/site/admin/$1"
-    },
-    {
-      "source": "/uploads/(.*)",
-      "destination": "/api/uploads/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/site/$1"
+      "destination": "/admin/login.html"
     }
   ]
 }
-

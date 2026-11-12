@@ -73,11 +73,21 @@ Ao executar a migração, você **DEVE OBRIGATORIAMENTE** seguir estas diretrize
   export default app;
   ```
 
-### Regra 7: Estrutura Monorepo e Build Automático na Raiz
-- **Problema:** A Vercel executada a partir da raiz do repositório não sabe onde estão os arquivos estáticos nem que deve instalar os pacotes da subpasta `api/`.
-- **Solução:**
-  - Criar um `package.json` na raiz com `"workspaces": ["api"]` e script `"build": "npm install --prefix api"`.
-  - Criar um `vercel.json` na raiz com rewrites para `/api/(.*)` -> `/api/index.js`, `/admin/(.*)` -> `/site/admin/$1` e `/(.*)` -> `/site/$1`.
+### Regra 7: Estrutura Monorepo e Output Directory na Vercel (`STATIC_BUILD_NO_OUT_DIR`)
+- **Problema:** Ao rodar `npm run build` na raiz, a Vercel assume que o projeto compilará arquivos para uma pasta chamada `public`. Como o front-end está em `site/`, o build falha com o erro:
+  `Error: [STATIC_BUILD_NO_OUT_DIR] No Output Directory named "public" found after the Build completed.`
+- **Solução:** No `vercel.json` da raiz, defina obrigatoriamente `"outputDirectory": "site"`, para que a Vercel sirva o conteúdo de `site/` diretamente como a raiz web:
+  ```json
+  {
+    "version": 2,
+    "outputDirectory": "site",
+    "rewrites": [
+      { "source": "/api/(.*)", "destination": "/api/index.js" },
+      { "source": "/api", "destination": "/api/index.js" },
+      { "source": "/admin", "destination": "/admin/login.html" }
+    ]
+  }
+  ```
 
 ---
 
@@ -159,13 +169,11 @@ Adaptar cada controller para consumir o Supabase mantendo rigorosamente os **mes
    ```json
    {
      "version": 2,
+     "outputDirectory": "site",
      "rewrites": [
        { "source": "/api/(.*)", "destination": "/api/index.js" },
        { "source": "/api", "destination": "/api/index.js" },
-       { "source": "/admin", "destination": "/site/admin/login.html" },
-       { "source": "/admin/(.*)", "destination": "/site/admin/$1" },
-       { "source": "/uploads/(.*)", "destination": "/api/uploads/$1" },
-       { "source": "/(.*)", "destination": "/site/$1" }
+       { "source": "/admin", "destination": "/admin/login.html" }
      ]
    }
    ```
