@@ -38,7 +38,9 @@ import lojasRouter from "./routes/lojasRoutes.js";
     app.use('/api/lojas', lojasRouter)
 
     // Definindo a porta de excução da API e uma função ao iniciar
-    app.listen( PORT , () => {
-        console.log(`A API está rodando em http://localhost:${PORT}/api`)
-        // console.log('A API está rodando em http://localhost:' + process.env.PORT + '/api')
-    })
+    // app.listen( PORT , () => {
+    //     console.log(`A API está rodando em http://localhost:${PORT}/api`)
+    //     // console.log('A API está rodando em http://localhost:' + process.env.PORT + '/api')
+    // })
+
+    export default app;
