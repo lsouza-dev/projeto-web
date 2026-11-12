@@ -3,11 +3,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const supabaseUrl = process.env.SUPABASE_URL || 'https://lzlgxocaxnbrqysuvqmn.supabase.co';
-const supabaseKey = process.env.SUPABASE_SECRET_KEY 
-    || process.env.SUPABASE_SERVICE_ROLE_KEY 
-    || process.env.SUPABASE_PUBLISHABLE_KEY 
-    || 'sb_secret_0UcV9ZFZEdoOY4maKmNqiw_GZNlo6DB';
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SECRET_KEY
+    || process.env.SUPABASE_SERVICE_ROLE_KEY
+    || process.env.SUPABASE_PUBLISHABLE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
     console.error('ATENÇÃO: Variáveis SUPABASE_URL ou SUPABASE_SECRET_KEY não encontradas!');
