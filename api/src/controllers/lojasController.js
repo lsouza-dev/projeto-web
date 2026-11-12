@@ -1,11 +1,20 @@
-import mySql from '../db/config.js'
+import { supabase } from '../db/config.js';
 
 async function ListarTodasLojas(request, response) {
     try {
-        const sql = `SELECT id, nome, descricao, imagem_url, id_usuario FROM lojas`;
-        const [lojas] = await mySql.query(sql);
-        return response.json({ lojas });
+        const { data: lojas, error } = await supabase
+            .from('lojas')
+            .select('id, nome, descricao, imagem_url, id_usuario')
+            .order('id', { ascending: true });
+
+        if (error) {
+            console.error("Erro ao buscar lojas:", error);
+            return response.status(500).json({ mensagem: "Erro ao buscar lojas." });
+        }
+
+        return response.json({ lojas: lojas || [] });
     } catch (err) {
+        console.error("Erro inesperado em ListarTodasLojas:", err);
         return response.status(500).json({ mensagem: "Erro ao buscar lojas." });
     }
 }
@@ -13,40 +22,65 @@ async function ListarTodasLojas(request, response) {
 async function BuscarLojaPorId(request, response) {
     const { id } = request.params;
     try {
-        const sql = `SELECT id, nome, descricao, imagem_url, id_usuario FROM lojas WHERE id = ?`;
-        const [loja] = await mySql.query(sql, [id]);
-        if (!loja[0]) {
+        const { data: loja, error } = await supabase
+            .from('lojas')
+            .select('id, nome, descricao, imagem_url, id_usuario')
+            .eq('id', id)
+            .maybeSingle();
+
+        if (error) {
+            console.error("Erro ao buscar loja por id:", error);
+            return response.status(500).json({ mensagem: "Erro ao buscar loja." });
+        }
+
+        if (!loja) {
             return response.status(404).json({ mensagem: "Loja não encontrada." });
         }
-        return response.json({ loja: loja[0] });
+
+        return response.json({ loja });
     } catch (err) {
+        console.error("Erro inesperado em BuscarLojaPorId:", err);
         return response.status(500).json({ mensagem: "Erro ao buscar loja." });
     }
 }
 
-async function BuscarLojasDoUsuario(request,response){
-    const {id} =  request.params;
+async function BuscarLojasDoUsuario(request, response) {
+    const { id } = request.params;
+    try {
+        const { data: usuario, error: erroUsuario } = await supabase
+            .from('usuarios')
+            .select('id')
+            .eq('id', id)
+            .maybeSingle();
 
-    const usuarioSql = "SELECT id FROM usuarios WHERE id = ?"
-    const [usuario] = await mySql.query(usuarioSql,id)
+        if (erroUsuario) {
+            console.error("Erro ao verificar usuario:", erroUsuario);
+            return response.status(500).json({ mensagem: "Erro ao consultar usuário." });
+        }
 
-    if(!usuario[0]){
-        return response.status(404).json({
-            mensagem: "Usuário não encontrado."
-        })
+        if (!usuario) {
+            return response.status(404).json({
+                mensagem: "Usuário não encontrado."
+            });
+        }
+
+        const { data: lojas, error: erroLojas } = await supabase
+            .from('lojas')
+            .select('id, nome, descricao, imagem_url')
+            .eq('id_usuario', id);
+
+        if (erroLojas) {
+            console.error("Erro ao buscar lojas do usuario:", erroLojas);
+            return response.status(500).json({ mensagem: "Erro ao buscar lojas do usuário." });
+        }
+
+        return response.json({
+            lojas: lojas || []
+        });
+    } catch (err) {
+        console.error("Erro inesperado em BuscarLojasDoUsuario:", err);
+        return response.status(500).json({ mensagem: "Erro ao buscar lojas do usuário." });
     }
-
-    const sql = `
-        SELECT id,nome,descricao,imagem_url
-        FROM lojas
-        WHERE id_usuario = ?
-    `
-
-    const [lojas] = await mySql.query(sql,id)
-    return response.json({
-        lojas
-    })
-
 }
 
-export { ListarTodasLojas, BuscarLojaPorId, BuscarLojasDoUsuario }
+export { ListarTodasLojas, BuscarLojaPorId, BuscarLojasDoUsuario };

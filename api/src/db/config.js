@@ -1,19 +1,23 @@
-import mysql from 'mysql2/promise'; // Importando o pacote mysql que foi instalado com npm install mysql2
-
+import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
-//Importando o pacote dotenv que foi instalado com npm install dotenv
 
-// Buscando os valores de .env
 dotenv.config();
 
-// Criando a conexão com o banco de dados
-const mySql = await mysql.createConnection({
-    host: process.env.DB_HOST, // Host do banco
-    user: process.env.DB_USER, // Usuário
-    password: process.env.DB_PASSWORD, // Senha
-    database: process.env.DB_NAME, // Nome do banco criado
-    waitForConnections: true // Aguarda por conexão
-})
+const supabaseUrl = process.env.SUPABASE_URL || 'https://lzlgxocaxnbrqysuvqmn.supabase.co';
+const supabaseKey = process.env.SUPABASE_SECRET_KEY 
+    || process.env.SUPABASE_SERVICE_ROLE_KEY 
+    || process.env.SUPABASE_PUBLISHABLE_KEY 
+    || 'sb_secret_0UcV9ZFZEdoOY4maKmNqiw_GZNlo6DB';
 
-// Exportando a conexão com o banco
-export default mySql;
+if (!supabaseUrl || !supabaseKey) {
+    console.error('ATENÇÃO: Variáveis SUPABASE_URL ou SUPABASE_SECRET_KEY não encontradas!');
+}
+
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: {
+        persistSession: false,
+        autoRefreshToken: false
+    }
+});
+
+export default supabase;

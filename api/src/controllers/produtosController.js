@@ -1,209 +1,250 @@
-import mySql from '../db/config.js'
+import { supabase } from '../db/config.js';
 
 async function CriarProduto(request, response) {
-    const {
-        nome,
-        descricao,
-        preco,
-        quantidade,
-        id_categoria,
-        id_loja,
-        imagem_url
-    } = request.body;
+    try {
+        const {
+            nome,
+            descricao,
+            preco,
+            quantidade,
+            id_categoria,
+            id_loja,
+            imagem_url
+        } = request.body;
 
-    if (!id_categoria) {
-        return response.status(400).json({
-            mensagem: "O id_categoria é obrigatório;"
-        })
+        if (!nome) {
+            return response.status(400).json({ mensagem: "O nome do produto é obrigatório." });
+        }
+
+        if (!id_categoria) {
+            return response.status(400).json({
+                mensagem: "O id_categoria é obrigatório;"
+            });
+        }
+
+        if (!id_loja) {
+            return response.status(400).json({
+                mensagem: "O id_loja é obrigatório;"
+            });
+        }
+
+        // Valida se a categoria existe
+        const { data: categoria, error: erroCategoria } = await supabase
+            .from('categorias')
+            .select('id')
+            .eq('id', id_categoria)
+            .maybeSingle();
+
+        if (erroCategoria || !categoria) {
+            return response.status(404).json({
+                mensagem: "Categoria não encontrada"
+            });
+        }
+
+        // Valida se a loja existe
+        const { data: loja, error: erroLoja } = await supabase
+            .from('lojas')
+            .select('id')
+            .eq('id', id_loja)
+            .maybeSingle();
+
+        if (erroLoja || !loja) {
+            return response.status(404).json({
+                mensagem: "Loja não encontrada"
+            });
+        }
+
+        const { error } = await supabase
+            .from('produtos')
+            .insert([{
+                nome,
+                descricao: descricao || '',
+                preco: Number(preco) || 0,
+                quantidade: Number(quantidade) || 0,
+                id_categoria: Number(id_categoria),
+                id_loja: Number(id_loja),
+                imagem_url: imagem_url || null
+            }]);
+
+        if (error) {
+            console.error("Erro ao cadastrar produto:", error);
+            return response.status(500).json({ mensagem: "Erro ao cadastrar produto no banco." });
+        }
+
+        return response.json({
+            mensagem: "Produto cadastrado com sucesso!"
+        });
+    } catch (err) {
+        console.error("Erro inesperado em CriarProduto:", err);
+        return response.status(500).json({ mensagem: "Erro interno no servidor." });
     }
-
-    if (!id_loja) {
-        return response.status(400).json({
-            mensagem: "O id_loja é obrigatório;"
-        })
-    }
-    const categoriaSQL = "SELECT id FROM categorias WHERE id = ?"
-    const [categoria] = await mySql.query(categoriaSQL, id_categoria)
-
-    if (!categoria[0]) {
-        return response.status(404).json({
-            mensagem: "Categoria não encontrada"
-        })
-    }
-
-    const lojaSQL = "SELECT id FROM lojas WHERE id = ?"
-    const [loja] = await mySql.query(lojaSQL, id_loja)
-
-    if (!loja[0]) {
-        return response.status(404).json({
-            mensagem: "Loja não encontrada"
-        })
-    }
-
-    const produtoSQL =
-        "INSERT INTO produtos "
-        + "(nome,descricao,preco,quantidade,id_categoria,id_loja,imagem_url) "
-        + "VALUES (?,?,?,?,?,?,?)"
-
-    await mySql.query(produtoSQL,
-        [nome, descricao, preco, quantidade, id_categoria, id_loja, imagem_url || null]
-    )
-
-    return response.json({
-        mensagem: "Produto cadastrado com sucesso!"
-    })
 }
 
 async function ListarProdutos(request, response) {
+    try {
+        const { id } = request.params;
+        const { texto, categoria, qtdMin, qtdMax, precoMin, precoMax } = request.query;
 
-    const { id } = request.params;
-    const { texto, categoria, qtdMin, qtdMax, precoMin, precoMax } = request.query;
-    let params = [id]
+        // Valida se a loja existe
+        const { data: loja, error: erroLoja } = await supabase
+            .from('lojas')
+            .select('id')
+            .eq('id', id)
+            .maybeSingle();
 
-    const lojaSql = "SELECT * FROM lojas WHERE id = ?"
-    const [loja] = await mySql.query(lojaSql, id)
+        if (erroLoja || !loja) {
+            return response.status(404).json({
+                mensagem: "Loja não encontrada"
+            });
+        }
 
-    if (!loja[0]) {
-        return response.status(404).json({
-            mensagem: "Loja não encontrada"
-        })
+        let query = supabase
+            .from('produtos')
+            .select('id, nome, descricao, preco, quantidade, imagem_url, id_categoria, categorias!inner(id, nome)')
+            .eq('id_loja', id);
+
+        if (texto) {
+            query = query.or(`nome.ilike.%${texto}%,descricao.ilike.%${texto}%`);
+        }
+
+        if (categoria) {
+            query = query.ilike('categorias.nome', `%${categoria}%`);
+        }
+
+        if (precoMin) {
+            query = query.gte('preco', Number(precoMin));
+        }
+
+        if (precoMax) {
+            query = query.lte('preco', Number(precoMax));
+        }
+
+        if (qtdMin) {
+            query = query.gte('quantidade', Number(qtdMin));
+        }
+
+        if (qtdMax) {
+            query = query.lte('quantidade', Number(qtdMax));
+        }
+
+        const { data, error } = await query.order('id', { ascending: true });
+
+        if (error) {
+            console.error("Erro ao listar produtos no Supabase:", error);
+            return response.status(500).json({ mensagem: "Erro ao buscar produtos." });
+        }
+
+        // Mapeia para manter a estrutura exata esperada pelo front-end
+        const produtos = (data || []).map(p => ({
+            id: p.id,
+            nome: p.nome,
+            descricao: p.descricao,
+            preco: Number(p.preco),
+            quantidade: Number(p.quantidade),
+            imagem_url: p.imagem_url,
+            id_categoria: p.id_categoria,
+            nome_categoria: p.categorias ? p.categorias.nome : null
+        }));
+
+        return response.json({ produtos });
+    } catch (err) {
+        console.error("Erro inesperado em ListarProdutos:", err);
+        return response.status(500).json({ mensagem: "Erro interno no servidor." });
     }
-
-    let sql =
-        `SELECT
-        p.id,
-        p.nome,
-        p.descricao,
-        p.preco,
-        p.quantidade,
-        p.imagem_url,
-        c.id as id_categoria,
-        c.nome as nome_categoria
-    FROM produtos AS p
-    INNER JOIN categorias AS c ON c.id = p.id_categoria
-    WHERE p.id_loja = ? 
-    `
-
-    if (texto) {
-        sql += "AND (p.descricao LIKE ? OR p.nome LIKE ?)"
-        params.push(`%${texto}%`)
-        params.push(`%${texto}%`)
-    }
-
-    if (categoria) {
-        sql += "AND c.nome LIKE ?"
-        params.push(`%${categoria}%`)
-    }
-
-    if (precoMin) {
-        sql += "AND p.preco >= ?"
-        params.push(Number(precoMin))
-    }
-
-    if (precoMax) {
-        sql += "AND p.preco <= ?"
-        params.push(Number(precoMax))
-    }
-
-    if (qtdMin) {
-        sql += "AND p.quantidade >= ? "
-        params.push(Number(qtdMin))
-    }
-
-
-    if (qtdMax) {
-        sql += "AND p.quantidade <= ? "
-        params.push(Number(qtdMax))
-    }
-
-    const [produtos] = await mySql.query(sql, params)
-    return response.json({ produtos })
 }
 
 async function AtualizarProduto(request, response) {
-    const { id } = request.params
+    try {
+        const { id } = request.params;
+        const {
+            nome,
+            descricao,
+            preco,
+            quantidade,
+            id_categoria,
+            imagem_url
+        } = request.body;
 
-    const {
-        nome,
-        descricao,
-        preco,
-        quantidade,
-        id_categoria,
-        imagem_url
-    } = request.body;
+        const updates = {};
 
-    let campos = []
-    let params = []
+        if (id_categoria) {
+            const { data: categoria, error: erroCategoria } = await supabase
+                .from('categorias')
+                .select('id')
+                .eq('id', id_categoria)
+                .maybeSingle();
 
-    if (id_categoria) {
+            if (erroCategoria || !categoria) {
+                return response.status(404).json({
+                    mensagem: "Categoria não encontrada"
+                });
+            }
 
-        const categoriaSQL = "SELECT id FROM categorias WHERE id = ?"
-        const [categoria] = await mySql.query(categoriaSQL, id_categoria)
-
-        if (!categoria[0]) {
-            return response.status(404).json({
-                mensagem: "Categoria não encontrada"
-            })
+            updates.id_categoria = Number(id_categoria);
         }
 
-        campos.push("id_categoria = ?")
-        params.push(categoria[0].id)
+        if (nome !== undefined) updates.nome = nome;
+        if (descricao !== undefined) updates.descricao = descricao;
+        if (preco !== undefined) updates.preco = Number(preco);
+        if (quantidade !== undefined && quantidade !== null) updates.quantidade = Number(quantidade);
+        if (imagem_url !== undefined) updates.imagem_url = imagem_url;
 
+        if (Object.keys(updates).length === 0) {
+            return response.status(400).json({ mensagem: "Nenhum campo fornecido para atualização." });
+        }
+
+        const { error } = await supabase
+            .from('produtos')
+            .update(updates)
+            .eq('id', id);
+
+        if (error) {
+            console.error("Erro ao atualizar produto:", error);
+            return response.status(500).json({ mensagem: "Erro ao atualizar produto." });
+        }
+
+        return response.json({
+            mensagem: "Produto atualizado com sucesso!"
+        });
+    } catch (err) {
+        console.error("Erro inesperado em AtualizarProduto:", err);
+        return response.status(500).json({ mensagem: "Erro interno no servidor." });
     }
-
-    if (nome) {
-        campos.push("nome = ?")
-        params.push(nome)
-    }
-
-    if (descricao) {
-        campos.push("descricao = ?")
-        params.push(descricao)
-    }
-
-    if (preco) {
-        campos.push("preco = ?")
-        params.push(Number(preco))
-    }
-
-    if (quantidade !== undefined && quantidade !== null) {
-        campos.push("quantidade = ?")
-        params.push(Number(quantidade))
-    }
-
-    if (imagem_url !== undefined) {
-        campos.push("imagem_url = ?")
-        params.push(imagem_url)
-    }
-
-    const sql = `UPDATE produtos SET ${campos.join(',')} WHERE id = ?`
-    await mySql.query(sql, [...params, id])
-
-    return response.json({
-        mensagem: "Produto atualizado com sucesso!"
-    })
 }
 
 async function ExcluirProduto(request, response) {
-    const { id } = request.params;
+    try {
+        const { id } = request.params;
 
-    const verificaoSql = "SELECT * FROM produtos WHERE id = ?";
-    const [produto] = await mySql.query(verificaoSql, id)
+        const { data: produto, error: erroVerif } = await supabase
+            .from('produtos')
+            .select('id')
+            .eq('id', id)
+            .maybeSingle();
 
-    console.log(produto[0])
+        if (erroVerif || !produto) {
+            return response.status(404).json({
+                mensagem: "Produto não encontrado!"
+            });
+        }
 
-    if (!produto[0]) {
-        return response.status(404).json({
-            mensagem: "Produto não encontrado!"
-        })
+        const { error } = await supabase
+            .from('produtos')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            console.error("Erro ao excluir produto:", error);
+            return response.status(500).json({ mensagem: "Erro ao excluir produto." });
+        }
+
+        return response.json({
+            mensagem: "Produto excluído com sucesso!"
+        });
+    } catch (err) {
+        console.error("Erro inesperado em ExcluirProduto:", err);
+        return response.status(500).json({ mensagem: "Erro interno no servidor." });
     }
-
-    const exclusaoSql = "DELETE FROM produtos WHERE id = ?"
-    await mySql.query(exclusaoSql, id);
-
-    return response.json({
-        mensagem: "Produto excluído com sucesso!"
-    })
 }
 
 async function UploadImagem(request, response) {
@@ -224,4 +265,4 @@ async function UploadImagem(request, response) {
     });
 }
 
-export { CriarProduto, ListarProdutos, AtualizarProduto, ExcluirProduto, UploadImagem }
+export { CriarProduto, ListarProdutos, AtualizarProduto, ExcluirProduto, UploadImagem };
