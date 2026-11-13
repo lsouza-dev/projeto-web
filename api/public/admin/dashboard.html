@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo | Aura Moda</title>
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%22><text y=%2222%22 font-size=%2222%22>⚡</text></svg>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- ======================================================================
+       LAYOUT DO DASHBOARD EM GRID 1fr / 4fr
+       ====================================================================== -->
+  <div class="dashboard-grid-layout">
+
+    <!-- ------------------------------------------------------------------
+         COLUNA LATERAL (1fr)
+         ------------------------------------------------------------------ -->
+    <aside class="dashboard-sidebar">
+      <!-- Marca / Logo -->
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">
+          <i class="fa-solid fa-shirt"></i>
+        </div>
+        <div>
+          <div class="sidebar-brand-name">Aura Moda</div>
+          <div class="sidebar-brand-badge">Painel de Controle</div>
+        </div>
+      </div>
+
+      <!-- Informações do Usuário Logado -->
+      <div class="sidebar-user-card">
+        <div class="user-avatar-circle" id="userAvatarLetter">U</div>
+        <div class="user-info-text">
+          <div class="user-display-name" id="userDisplayName">Carregando...</div>
+          <div class="user-display-email" id="userDisplayEmail">email@dominio.com</div>
+        </div>
+      </div>
+
+      <!-- Seletor Interativo de Troca de Loja no Painel Admin -->
+      <div class="sidebar-store-switcher" title="Selecione a loja para gerenciar">
+        <label for="adminActiveStoreSelect" class="sidebar-store-label">
+          <i class="fa-solid fa-store" style="color: var(--admin-accent);"></i>
+          <span>Loja Ativa:</span>
+        </label>
+        <select id="adminActiveStoreSelect" class="admin-store-select">
+          <!-- Carregado dinamicamente via admin.js -->
+        </select>
+      </div>
+
+      <!-- Navegação dos Módulos Mapeados -->
+      <div class="sidebar-nav-heading">Módulos Administrativos</div>
+      <ul class="sidebar-modules-list" id="sidebarModulesList">
+        <!-- Renderizado dinamicamente pelo admin.js -->
+      </ul>
+
+      <!-- Rodapé da Sidebar: Ver Loja e Logout -->
+      <div class="sidebar-footer">
+        <a href="../index.html" class="btn-sidebar-action" target="_blank" title="Abrir mostruário em nova aba">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>Ver Mostruário Público</span>
+        </a>
+        <button type="button" class="btn-sidebar-action btn-logout" id="btnLogout" title="Encerrar sessão atual">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Sair da Conta</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ------------------------------------------------------------------
+         COLUNA DE CONTEÚDO (4fr)
+         ------------------------------------------------------------------ -->
+    <main class="dashboard-main-content">
+
+      <!-- Header da Entidade Selecionada + Botão de Criação no Canto Superior Direito -->
+      <header class="content-header">
+        <div class="content-title-wrap">
+          <h1 id="activeModuleTitle">Gestão de Produtos</h1>
+          <p id="activeModuleDesc">Gerencie as peças de vestuário, estoque, preços e categorias da sua loja.</p>
+        </div>
+
+        <div class="header-action-btns">
+          <!-- Botão de Alternância de Tema no Admin -->
+          <button type="button" class="btn-icon" id="adminThemeToggleBtn" title="Alternar entre Modo Claro e Escuro" aria-label="Alternar Tema">
+            <i class="fa-solid fa-moon" id="adminThemeToggleIcon"></i>
+          </button>
+
+          <!-- Botão de Criação que abre o modal gerado dinamicamente -->
+          <button type="button" class="btn-create-entity" id="btnOpenCreateModal">
+            <i class="fa-solid fa-plus"></i>
+            <span id="createEntityBtnLabel">Novo Produto</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- KPI Cards Informativos -->
+      <section class="kpi-row" id="kpiRow">
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap kpi-icon-blue">
+            <i class="fa-solid fa-box-archive"></i>
+          </div>
+          <div>
+            <div class="kpi-info-label" id="kpiLabel1">Total de Peças</div>
+            <div class="kpi-info-val" id="kpiVal1">0</div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap kpi-icon-gold">
+            <i class="fa-solid fa-tags"></i>
+          </div>
+          <div>
+            <div class="kpi-info-label" id="kpiLabel2">Categorias Ativas</div>
+            <div class="kpi-info-val" id="kpiVal2">0</div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap kpi-icon-green">
+            <i class="fa-solid fa-store"></i>
+          </div>
+          <div>
+            <div class="kpi-info-label" id="kpiLabel3">Loja Conectada</div>
+            <div class="kpi-info-val" id="kpiVal3" style="font-size: 1.1rem; font-weight: 700;">Senac Moda</div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap" style="background: rgba(22, 163, 74, 0.15); color: #16a34a;">
+            <i class="fa-solid fa-coins"></i>
+          </div>
+          <div>
+            <div class="kpi-info-label" id="kpiLabel4">Valor em Estoque</div>
+            <div class="kpi-info-val" id="kpiVal4" style="font-size: 1.05rem; font-weight: 700; color: #16a34a;">R$ 0,00</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Painel da Tabela de Registros -->
+      <section class="table-panel-card">
+        <!-- Barra de Filtros Dedicada para Produtos -->
+        <div class="admin-filters-bar" id="adminProductsFilterBar">
+          <form id="adminFiltersForm" class="admin-filters-grid" onsubmit="event.preventDefault();">
+            <!-- Busca por Nome ou Descrição -->
+            <div class="admin-filter-group">
+              <label for="adminFilterTexto" class="admin-filter-label">Buscar Peça / Descrição</label>
+              <div style="position: relative; display: flex; align-items: center;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; color: var(--text-light); font-size: 0.8rem; pointer-events: none;"></i>
+                <input type="text" id="adminFilterTexto" class="admin-filter-input" style="padding-left: 28px;" placeholder="Ex: Polo, Bermuda, Tênis...">
+              </div>
+            </div>
+
+            <!-- Categoria -->
+            <div class="admin-filter-group">
+              <label for="adminFilterCategoria" class="admin-filter-label">Categoria</label>
+              <select id="adminFilterCategoria" class="admin-filter-select">
+                <option value="">Todas as Categorias</option>
+              </select>
+            </div>
+
+            <!-- Preço Mín / Máx -->
+            <div class="admin-filter-group">
+              <label class="admin-filter-label">Preço (R$)</label>
+              <div class="admin-range-wrap">
+                <input type="number" id="adminFilterPrecoMin" class="admin-filter-input" placeholder="Mín" min="0" step="0.01">
+                <span style="color: var(--text-light); font-size: 0.75rem;">-</span>
+                <input type="number" id="adminFilterPrecoMax" class="admin-filter-input" placeholder="Máx" min="0" step="0.01">
+              </div>
+            </div>
+
+            <!-- Estoque Mín / Máx -->
+            <div class="admin-filter-group">
+              <label class="admin-filter-label">Estoque (Qtd)</label>
+              <div class="admin-range-wrap">
+                <input type="number" id="adminFilterQtdMin" class="admin-filter-input" placeholder="Mín" min="0">
+                <span style="color: var(--text-light); font-size: 0.75rem;">-</span>
+                <input type="number" id="adminFilterQtdMax" class="admin-filter-input" placeholder="Máx" min="0">
+              </div>
+            </div>
+
+            <!-- Botão Limpar -->
+            <div class="admin-filter-group">
+              <label class="admin-filter-label" style="visibility: hidden;">Ação</label>
+              <button type="button" id="btnAdminResetFilters" class="admin-btn-clear-filters" title="Limpar todos os filtros">
+                <i class="fa-solid fa-rotate-left"></i> Limpar
+              </button>
+            </div>
+          </form>
+
+          <!-- Filtros Rápidos (Chips) e Indicador de Registros -->
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.775rem;">
+            <div class="admin-quick-filter-pills" id="adminQuickFilterPills">
+              <span style="color: var(--text-muted); font-weight: 600;">Atalhos:</span>
+              <button type="button" class="admin-quick-pill active" data-quick="all">Todos</button>
+              <button type="button" class="admin-quick-pill" data-quick="low-stock">Estoque Baixo (&le; 40 un.)</button>
+              <button type="button" class="admin-quick-pill" data-quick="out-stock">Esgotados</button>
+              <button type="button" class="admin-quick-pill" data-quick="premium">Mais Caros (&ge; R$ 150)</button>
+            </div>
+
+            <div style="color: var(--text-muted);">
+              Exibindo <span id="tableRecordCount" style="font-weight: 700; color: var(--text-main);">0</span> produto(s)
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra de Busca Simples para Categorias e Lojas -->
+        <div class="table-toolbar" id="adminSimpleToolbar" style="display: none;">
+          <div style="position: relative; display: flex; align-items: center;">
+            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; color: var(--text-light); font-size: 0.85rem;"></i>
+            <input type="text" id="tableSearchInput" class="table-search-input" placeholder="Pesquisar registros...">
+          </div>
+
+          <div style="font-size: 0.8125rem; color: var(--text-muted);">
+            Exibindo <span id="tableRecordCountSimple" style="font-weight: 700; color: var(--text-main);">0</span> registro(s)
+          </div>
+        </div>
+
+        <!-- Tabela Responsiva de Dados -->
+        <div class="table-responsive">
+          <table class="admin-data-table" id="adminDataTable">
+            <thead id="tableHead">
+              <!-- Renderizado dinamicamente -->
+            </thead>
+            <tbody id="tableBody">
+              <!-- Renderizado dinamicamente -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- ======================================================================
+       MODAL CRUD GERADO DINAMICAMENTE
+       Baseado nas colunas reais da entidade mapeada no SQL
+       ====================================================================== -->
+  <div class="admin-modal-overlay" id="crudModalOverlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title" id="crudModalTitle">Cadastrar Novo Registro</h3>
+        <button type="button" class="btn-icon" id="btnCloseCrudModal" aria-label="Fechar Modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="crudDynamicForm">
+        <div class="admin-modal-body" id="crudModalFieldsContainer">
+          <!-- Campos do formulário gerados dinamicamente com base no SQL -->
+        </div>
+
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-secondary" id="btnCancelCrudModal">Cancelar</button>
+          <button type="submit" class="btn-create-entity" id="btnSaveCrudModal">
+            <i class="fa-solid fa-check"></i>
+            <span>Salvar Registro</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação de Exclusão -->
+  <div class="admin-modal-overlay" id="confirmDeleteModalOverlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="admin-modal-card" style="max-width: 440px;">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title" style="color: var(--danger);">
+          <i class="fa-solid fa-triangle-exclamation"></i> Confirmar Exclusão
+        </h3>
+        <button type="button" class="btn-icon" id="btnCloseDeleteModal">&times;</button>
+      </div>
+      <div class="admin-modal-body">
+        <p id="deleteModalMessage" style="font-size: 0.925rem; color: var(--text-main); margin-bottom: 8px;">
+          Tem certeza de que deseja remover este item?
+        </p>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">
+          Esta ação é irreversível e refletirá imediatamente no mostruário público.
+        </p>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn-secondary" id="btnCancelDelete">Cancelar</button>
+        <button type="button" class="btn-action-sm btn-action-delete" id="btnConfirmDelete" style="padding: 10px 18px; font-size: 0.875rem;">
+          <i class="fa-solid fa-trash-can"></i> Confirmar Exclusão
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toasts de Notificação do Admin -->
+  <div class="admin-toast-container" id="adminToastContainer" aria-live="polite"></div>
+
+  <!-- Script Administrativo -->
+  <script src="admin.js"></script>
+</body>
+</html>
+

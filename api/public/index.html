@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="htmlPageTitle">Mostruário Oficial de Roupas & Coleções</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%22><text y=%2222%22 font-size=%2222%22>✨</text></svg>">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- CSS Principal -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Announcement Bar (Inspirado em Zara & Farfetch: benefícios reais e rotativos) -->
+  <aside class="top-notice-bar">
+    <div class="container top-notice-container">
+      <div class="notice-ticker" id="noticeTicker">
+        <span class="ticker-item active"><i class="fa-solid fa-truck-fast"></i> <strong>Frete Grátis</strong> para todo o Brasil em compras acima de R$ 199</span>
+        <span class="ticker-item"><i class="fa-solid fa-credit-card"></i> Parcelamento em até <strong>6x sem juros</strong> no cartão</span>
+        <span class="ticker-item"><i class="fa-solid fa-rotate-left"></i> <strong>Primeira Troca Grátis</strong> em até 30 dias</span>
+      </div>
+      <div class="notice-contact">
+        <a href="https://wa.me/5527992036558" target="_blank" rel="noopener" title="Atendimento Especializado via WhatsApp">
+          <i class="fa-brands fa-whatsapp" style="color: var(--whatsapp); font-size: 0.95rem;"></i>
+          <span>Atendimento VIP: <strong>+55 (27) 99203-6558</strong></span>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Header / Navbar Principal com Efeito Glassmorphism -->
+  <header class="site-header" id="siteHeader">
+    <div class="container">
+      <nav class="navbar">
+        <!-- Marca / Logo da Loja Adaptada Dinamicamente -->
+        <a href="index.html" class="brand" title="Ir para o início do mostruário">
+          <div class="store-logo-box" id="storeLogoBox">
+            <img id="storeLogoImg" src="" alt="Logo da Loja" class="store-logo-img">
+            <span id="storeLogoFallback" class="store-logo-fallback">M</span>
+          </div>
+          <div class="brand-text-wrap">
+            <h1 class="brand-title" id="pageStoreTitle">Mostruário Oficial</h1>
+            <span class="brand-subtitle" id="pageStoreSubtitle">Coleção de Roupas & Acessórios</span>
+          </div>
+        </a>
+
+        <!-- Seletor Interativo de Troca de Loja -->
+        <div class="store-switcher-wrap" title="Alternar entre lojas disponíveis">
+          <i class="fa-solid fa-store store-switcher-icon"></i>
+          <select id="storeSelector" class="store-select-dropdown" aria-label="Selecione a loja">
+            <!-- Opções de lojas carregadas dinamicamente via API -->
+          </select>
+        </div>
+
+        <!-- Ações do Header: Favoritos, Tema, WhatsApp, Sacola, Painel Admin -->
+        <div class="header-actions">
+          <!-- Botão de Favoritos (Wishlist) -->
+          <button class="btn-icon" id="openWishlistBtn" title="Ver Peças Favoritas" aria-label="Favoritos">
+            <i class="fa-regular fa-heart" id="wishlistHeaderIcon"></i>
+            <span class="badge-count badge-wishlist" id="wishlistCountBadge" style="display: none;">0</span>
+          </button>
+
+          <!-- Botão de Alternância de Tema Claro / Escuro -->
+          <button class="btn-icon" id="themeToggleBtn" title="Alternar entre Modo Claro e Escuro" aria-label="Alternar Tema">
+            <i class="fa-solid fa-moon" id="themeToggleIcon"></i>
+          </button>
+
+          <a href="https://wa.me/5527992036558" target="_blank" rel="noopener" class="btn-whatsapp-direct" title="Falar no WhatsApp com o Consultor">
+            <i class="fa-brands fa-whatsapp"></i>
+            <span>WhatsApp</span>
+          </a>
+
+          <!-- Botão da Sacola de Compras -->
+          <button class="btn-icon btn-cart-highlight" id="openCartBtn" title="Abrir Sacola de Compras" aria-label="Abrir Sacola">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span class="badge-count" id="cartCountBadge">0</span>
+          </button>
+
+          <!-- Link para o Painel Admin -->
+          <a href="admin/login.html" class="btn-admin-link" title="Acessar Painel Administrativo">
+            <i class="fa-solid fa-user-gear"></i>
+            <span>Admin</span>
+          </a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section Editorial com Cards de Confiança e Foto de Moda HD -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-grid">
+        <!-- Lado Esquerdo: Textos & Mini-Cards de Informação -->
+        <div class="hero-left-content">
+          <span class="hero-tag"><i class="fa-solid fa-sparkles"></i> Coleção 2026 &bull; Pronta Entrega</span>
+          <h2 class="hero-title" id="heroStoreHeadline">Coleção de Roupas & Acessórios</h2>
+          <p class="hero-description" id="heroStoreDesc">
+            Peças com corte refinado, tecido nobre e caimento impecável. Escolha seu tamanho, monte seu pedido e finalize direto com nosso consultor no WhatsApp com total comodidade.
+          </p>
+
+          <!-- Informações de entrega, preço e garantia em cards elegantes -->
+          <div class="hero-features-grid">
+            <div class="feature-mini-card">
+              <div class="feature-icon-circle">
+                <i class="fa-solid fa-truck-fast"></i>
+              </div>
+              <div>
+                <div class="feature-text-title">Envio Expresso</div>
+                <div class="feature-text-sub">Postagem rápida e rastreada</div>
+              </div>
+            </div>
+
+            <div class="feature-mini-card">
+              <div class="feature-icon-circle">
+                <i class="fa-solid fa-tag"></i>
+              </div>
+              <div>
+                <div class="feature-text-title">Preço Direto</div>
+                <div class="feature-text-sub">Valores exclusivos de fábrica</div>
+              </div>
+            </div>
+
+            <div class="feature-mini-card">
+              <div class="feature-icon-circle">
+                <i class="fa-solid fa-shield-check"></i>
+              </div>
+              <div>
+                <div class="feature-text-title">Qualidade Premium</div>
+                <div class="feature-text-sub">Garantia em cada costura</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lado Direito: Banner Visual de Moda Preenchendo o Espaço -->
+        <div class="hero-banner-visual">
+          <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80" alt="Coleção de Roupas" class="hero-banner-img">
+          <div class="hero-visual-badge">
+            <i class="fa-solid fa-gem" style="color: var(--accent);"></i>
+            <span>Mostruário Exclusivo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Barra de Navegação Rápida por Categoria (Pills / Carrossel Rápido ASOS Style) -->
+  <section class="quick-nav-section" aria-label="Navegação Rápida por Categoria">
+    <div class="container">
+      <div class="quick-nav-scroll" id="quickNavPillsContainer">
+        <button type="button" class="quick-pill active" data-category="">
+          <i class="fa-solid fa-sparkles"></i> Todos
+        </button>
+        <button type="button" class="quick-pill" data-category="Camisetas">
+          <i class="fa-solid fa-shirt"></i> Camisetas
+        </button>
+        <button type="button" class="quick-pill" data-category="Bermudas">
+          <i class="fa-solid fa-socks"></i> Bermudas
+        </button>
+        <button type="button" class="quick-pill" data-category="Meias">
+          <i class="fa-solid fa-layer-group"></i> Meias
+        </button>
+        <button type="button" class="quick-pill" data-category="Cuecas">
+          <i class="fa-solid fa-box"></i> Cuecas
+        </button>
+        <button type="button" class="quick-pill" data-category="Tênis">
+          <i class="fa-solid fa-shoe-prints"></i> Tênis
+        </button>
+        <button type="button" class="quick-pill" data-category="Jaquetas">
+          <i class="fa-solid fa-vest-patches"></i> Jaquetas
+        </button>
+        <button type="button" class="quick-pill quick-pill-fav" id="pillShowFavorites">
+          <i class="fa-solid fa-heart" style="color: #ef4444;"></i> Favoritos (<span id="pillFavCount">0</span>)
+        </button>
+        <button type="button" class="quick-pill quick-pill-promo" id="pillShowPromo">
+          <i class="fa-solid fa-fire" style="color: #f59e0b;"></i> Destaques
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Conteúdo Principal -->
+  <main class="container">
+
+    <!-- ======================================================================
+         1. FILTROS SERVER-SIDE DINÂMICOS & ORDENAÇÃO (ASOS / Farfetch Style)
+         ====================================================================== -->
+    <section class="filters-section" aria-label="Filtros de Produtos">
+      <div class="filters-card">
+        <div class="filters-header">
+          <div class="filters-header-title">
+            <i class="fa-solid fa-sliders"></i>
+            <span>Filtrar e Ordenar Peças</span>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <div class="sort-selector-wrap">
+              <label for="catalogSortSelector" class="sort-label"><i class="fa-solid fa-arrow-down-wide-short"></i> Ordenar:</label>
+              <select id="catalogSortSelector" class="sort-select-dropdown" aria-label="Ordenar produtos">
+                <option value="featured">✨ Em Destaque</option>
+                <option value="price_asc">🏷️ Menor Preço</option>
+                <option value="price_desc">💎 Maior Preço</option>
+                <option value="stock_desc">📦 Maior Estoque</option>
+                <option value="name_asc">🔤 Nome (A-Z)</option>
+              </select>
+            </div>
+            <button type="button" class="btn-clear-filters" id="resetFiltersBtn">
+              <i class="fa-solid fa-rotate-left"></i> Limpar
+            </button>
+          </div>
+        </div>
+
+        <form id="filtersForm" class="filters-grid" onsubmit="event.preventDefault();">
+          <!-- Busca Textual (Nome ou Descrição) -->
+          <div class="form-group">
+            <label for="filterTexto" class="form-label">Buscar Peça ou Descrição</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="filterTexto" class="input-field" placeholder="Ex: Polo, Linho, Corta-Vento...">
+            </div>
+          </div>
+
+          <!-- Select de Categoria (Gerado Dinamicamente do Banco) -->
+          <div class="form-group">
+            <label for="filterCategoria" class="form-label">Categoria</label>
+            <select id="filterCategoria" class="input-field">
+              <option value="">Todas as Categorias</option>
+              <!-- Carregadas via API /api/categorias -->
+            </select>
+          </div>
+
+          <!-- Faixa de Preço (precoMin e precoMax) -->
+          <div class="form-group">
+            <label class="form-label">Faixa de Preço (R$)</label>
+            <div class="range-inputs">
+              <input type="number" id="filterPrecoMin" class="input-field" placeholder="Mín" min="0" step="0.01">
+              <span class="range-separator">-</span>
+              <input type="number" id="filterPrecoMax" class="input-field" placeholder="Máx" min="0" step="0.01">
+            </div>
+          </div>
+
+          <!-- Faixa de Quantidade em Estoque (qtdMin e qtdMax) -->
+          <div class="form-group">
+            <label class="form-label">Estoque (Qtd)</label>
+            <div class="range-inputs">
+              <input type="number" id="filterQtdMin" class="input-field" placeholder="Mín" min="0">
+              <span class="range-separator">-</span>
+              <input type="number" id="filterQtdMax" class="input-field" placeholder="Máx" min="0">
+            </div>
+          </div>
+
+          <!-- Botão de Ação -->
+          <div class="form-group">
+            <label class="form-label" style="visibility: hidden;">Ação</label>
+            <button type="button" id="applyFiltersBtn" class="btn-filter-apply">
+              <i class="fa-solid fa-filter"></i> Filtrar
+            </button>
+          </div>
+        </form>
+
+        <!-- Barra de Status dos Filtros Ativos -->
+        <div class="filter-status-bar">
+          <div>
+            Mostrando <strong id="totalProductsCount">0</strong> produto(s) no catálogo
+          </div>
+          <div class="active-pills" id="activeFilterPills">
+            <!-- Pílulas de filtros aplicados -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Indicador de Carregamento (Loading) -->
+    <div class="loading-indicator" id="catalogLoading">
+      <div class="spinner"></div>
+      <span>Carregando mostruário de produtos...</span>
+    </div>
+
+    <!-- Estado Vazio / Sem Resultados -->
+    <div class="empty-state" id="emptyState" style="display: none;">
+      <div class="empty-state-icon">
+        <i class="fa-solid fa-box-open"></i>
+      </div>
+      <h3 class="empty-state-title">Nenhum produto encontrado</h3>
+      <p class="empty-state-desc">
+        Não encontramos roupas ou itens com os filtros selecionados. Tente ajustar os valores ou limpar os filtros para ver todo o mostruário.
+      </p>
+      <button type="button" class="btn-filter-apply" id="emptyStateResetBtn">
+        <i class="fa-solid fa-rotate-left"></i> Ver Todos os Produtos
+      </button>
+    </div>
+
+    <!-- ======================================================================
+         2. EXIBIÇÃO POR CATEGORIA (GRID HORIZONTAL COM SCROLL SUAVE & SETAS)
+         ====================================================================== -->
+    <section id="categoriesContainer" class="categories-wrapper">
+      <!-- Inserido dinamicamente pelo main.js agrupado por categoria -->
+    </section>
+
+  </main>
+
+  <!-- ======================================================================
+       3. MODAL DE DETALHES DO PRODUTO (SHOWROOM DE MODA DE LUXO)
+       ====================================================================== -->
+  <div class="modal-overlay" id="productModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-container">
+      <button type="button" class="modal-close-btn" id="closeModalBtn" aria-label="Fechar Modal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="product-modal-grid">
+        <!-- Coluna 1: Imagem com Badge e Efeito Zoom -->
+        <div class="modal-col-image">
+          <img id="modalProductImage" src="" alt="Produto" class="modal-product-img">
+          <button type="button" class="modal-fav-btn" id="modalFavToggleBtn" title="Salvar nos Favoritos" aria-label="Favoritar">
+            <i class="fa-regular fa-heart"></i>
+          </button>
+        </div>
+
+        <!-- Coluna 2: Detalhes, Seletor de Tamanho, Quantidade e Ações -->
+        <div class="modal-col-details">
+          <div class="modal-header-meta">
+            <span class="modal-category-tag" id="modalCategoryTag">Categoria</span>
+            <span class="modal-stock-badge stock-in" id="modalStockBadge">Em Estoque</span>
+          </div>
+
+          <h2 class="modal-product-title" id="modalProductTitle">Nome do Produto</h2>
+
+          <div class="modal-price-row">
+            <span class="modal-product-price" id="modalProductPrice">R$ 0,00</span>
+            <span class="modal-price-installment" id="modalPriceInstallment">ou 6x sem juros</span>
+          </div>
+
+          <!-- Seletor Interativo de Tamanhos de Roupa (P, M, G, GG, XG) -->
+          <div class="size-selector-wrap">
+            <div class="size-selector-header">
+              <span class="size-label">Selecione o Tamanho:</span>
+              <button type="button" class="btn-size-guide" id="btnOpenSizeGuide">
+                <i class="fa-solid fa-ruler-combined"></i> Guia de Medidas
+              </button>
+            </div>
+            <div class="size-chips-grid" id="modalSizeChips">
+              <button type="button" class="size-chip" data-size="P">P</button>
+              <button type="button" class="size-chip active" data-size="M">M</button>
+              <button type="button" class="size-chip" data-size="G">G</button>
+              <button type="button" class="size-chip" data-size="GG">GG</button>
+              <button type="button" class="size-chip" data-size="XG">XG</button>
+            </div>
+          </div>
+
+          <h4 class="modal-desc-heading">Descrição da Peça</h4>
+          <p class="modal-product-desc" id="modalProductDesc">
+            Descrição completa da peça de vestuário...
+          </p>
+
+          <!-- Seletor de Quantidade -->
+          <div class="quantity-control-wrap">
+            <label class="quantity-control-label" for="modalQuantityInput">Quantidade:</label>
+            <div class="quantity-stepper">
+              <button type="button" class="btn-qty-step" id="decreaseQtyBtn" aria-label="Diminuir">-</button>
+              <input type="number" id="modalQuantityInput" class="qty-input" value="1" min="1" max="99" readonly>
+              <button type="button" class="btn-qty-step" id="increaseQtyBtn" aria-label="Aumentar">+</button>
+            </div>
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 8px;" id="modalStockMaxText"></span>
+          </div>
+
+          <!-- Ações Principais -->
+          <div class="modal-actions-grid">
+            <button type="button" class="btn-modal-add-cart" id="modalAddToCartBtn">
+              <i class="fa-solid fa-bag-shopping"></i> Adicionar à Sacola
+            </button>
+            <button type="button" class="btn-modal-whatsapp" id="modalDirectWhatsAppBtn" title="Finalizar compra direta deste item pelo WhatsApp">
+              <i class="fa-brands fa-whatsapp"></i> Comprar Agora no WhatsApp
+            </button>
+          </div>
+
+          <!-- Accordion de Moda (Composição, Frete e Devoluções) -->
+          <div class="fashion-accordion">
+            <details class="accordion-item" open>
+              <summary class="accordion-header">
+                <span><i class="fa-solid fa-shirt"></i> Composição & Detalhes</span>
+                <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+              </summary>
+              <div class="accordion-content">
+                Tecido selecionado de alta gramatura, com toque aveludado e costuras reforçadas. Modelagem pensada para máximo conforto e durabilidade no uso diário.
+              </div>
+            </details>
+
+            <details class="accordion-item">
+              <summary class="accordion-header">
+                <span><i class="fa-solid fa-truck-fast"></i> Envio e Prazos</span>
+                <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+              </summary>
+              <div class="accordion-content">
+                Despacho em até 24h úteis após confirmação via WhatsApp. Rastreamento enviado direto no seu chat com suporte dedicado.
+              </div>
+            </details>
+
+            <details class="accordion-item">
+              <summary class="accordion-header">
+                <span><i class="fa-solid fa-rotate-left"></i> Troca Descomplicada</span>
+                <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+              </summary>
+              <div class="accordion-content">
+                Se o tamanho não ficar perfeito, realizamos a primeira troca sem custos em até 30 dias após o recebimento.
+              </div>
+            </details>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       4. MODAL GUIA DE MEDIDAS (Tabela Fashion Oficial)
+       ====================================================================== -->
+  <div class="modal-overlay" id="sizeGuideModal" role="dialog" aria-modal="true" aria-hidden="true" style="z-index: 10050;">
+    <div class="modal-container" style="max-width: 520px; padding: 24px;">
+      <button type="button" class="modal-close-btn" id="closeSizeGuideBtn" aria-label="Fechar Guia">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+        <i class="fa-solid fa-ruler-combined" style="color: var(--primary); font-size: 1.3rem;"></i>
+        <h3 style="font-family: var(--font-heading); font-size: 1.25rem;">Guia de Medidas (cm)</h3>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+        Use uma fita métrica para medir seu corpo e encontre seu tamanho ideal.
+      </p>
+      <div class="table-responsive">
+        <table class="size-guide-table">
+          <thead>
+            <tr>
+              <th>Tam</th>
+              <th>Tórax</th>
+              <th>Cintura</th>
+              <th>Quadril</th>
+              <th>Compr.</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>P</strong></td>
+              <td>90 - 96</td>
+              <td>76 - 82</td>
+              <td>90 - 96</td>
+              <td>70 cm</td>
+            </tr>
+            <tr>
+              <td><strong>M</strong></td>
+              <td>97 - 103</td>
+              <td>83 - 89</td>
+              <td>97 - 103</td>
+              <td>72 cm</td>
+            </tr>
+            <tr>
+              <td><strong>G</strong></td>
+              <td>104 - 110</td>
+              <td>90 - 96</td>
+              <td>104 - 110</td>
+              <td>74 cm</td>
+            </tr>
+            <tr>
+              <td><strong>GG</strong></td>
+              <td>111 - 118</td>
+              <td>97 - 104</td>
+              <td>111 - 118</td>
+              <td>76 cm</td>
+            </tr>
+            <tr>
+              <td><strong>XG</strong></td>
+              <td>119 - 126</td>
+              <td>105 - 112</td>
+              <td>119 - 126</td>
+              <td>78 cm</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button type="button" class="btn-filter-apply" id="closeSizeGuideConfirmBtn" style="width: 100%; margin-top: 18px;">
+        Entendi, escolher meu tamanho
+      </button>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       5. SACOLA DE COMPRAS & CHECKOUT WHATSAPP (ESTILO ZARA / NIKE)
+       ====================================================================== -->
+  <div class="cart-drawer-overlay" id="cartDrawerOverlay">
+    <aside class="cart-drawer" role="dialog" aria-modal="true" aria-label="Sacola de Compras">
+      <div class="cart-header">
+        <div class="cart-header-title">
+          <i class="fa-solid fa-bag-shopping" style="color: var(--accent);"></i>
+          <span>Sua Sacola</span>
+        </div>
+        <button type="button" class="cart-close-btn" id="closeCartBtn" aria-label="Fechar Sacola">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Barra Dinâmica de Frete Grátis (Nike/Zara Style) -->
+      <div class="free-shipping-card">
+        <div class="free-shipping-header">
+          <span id="freeShippingText"><i class="fa-solid fa-truck-fast"></i> Adicione mais itens para <strong>Frete Grátis</strong></span>
+        </div>
+        <div class="shipping-progress-track">
+          <div class="shipping-progress-bar" id="freeShippingProgressBar" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- Itens da Sacola -->
+      <div class="cart-items-list" id="cartItemsList">
+        <!-- Renderizado dinamicamente pelo main.js -->
+      </div>
+
+      <!-- Rodapé da Sacola com Cupons e Fechamento -->
+      <div class="cart-footer">
+        <!-- Campo de Cupom de Desconto -->
+        <div class="coupon-section">
+          <div class="coupon-input-wrap">
+            <i class="fa-solid fa-ticket coupon-icon"></i>
+            <input type="text" id="cartCouponInput" class="coupon-input" placeholder="Cupom (ex: PRIMEIRACOMPRA)" uppercase>
+            <button type="button" class="btn-apply-coupon" id="btnApplyCoupon">Aplicar</button>
+          </div>
+          <div class="coupon-message" id="couponMessage"></div>
+        </div>
+
+        <!-- Campos Opcionais: Nome do Cliente e Cidade/CEP -->
+        <div style="display: flex; flex-direction: column; gap: 8px; margin: 10px 0;">
+          <input type="text" id="cartCustomerName" class="customer-note-input" placeholder="Seu nome completo...">
+          <input type="text" id="cartDeliveryCity" class="customer-note-input" placeholder="Cidade / CEP para entrega (opcional)...">
+        </div>
+
+        <!-- Resumo Financeiro -->
+        <div class="cart-summary-row">
+          <span>Quantidade de Peças:</span>
+          <strong id="cartSummaryTotalQty">0</strong>
+        </div>
+        <div class="cart-summary-row" id="cartDiscountRow" style="display: none; color: #16a34a;">
+          <span>Desconto Cupom (<span id="couponDiscountPct">0%</span>):</span>
+          <strong id="cartDiscountValue">-R$ 0,00</strong>
+        </div>
+        <div class="cart-total-row">
+          <span>Total:</span>
+          <span id="cartSummaryTotalValue">R$ 0,00</span>
+        </div>
+
+        <!-- Botão de Finalização no WhatsApp -->
+        <button type="button" class="btn-whatsapp-checkout" id="whatsappCheckoutBtn">
+          <i class="fa-brands fa-whatsapp" style="font-size: 1.3rem;"></i>
+          <span>Finalizar Pedido via WhatsApp</span>
+        </button>
+
+        <button type="button" class="btn-clear-cart-link" id="clearCartBtn">
+          Esvaziar Sacola
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Botão Flutuante de Concierge WhatsApp (Bottom-Right) -->
+  <aside class="floating-whatsapp-wrap">
+    <div class="floating-whatsapp-tooltip">
+      <span>Dúvidas sobre tamanho? Fale com a gente!</span>
+    </div>
+    <a href="https://wa.me/5527992036558?text=Ol%C3%A1!%20Estou%20no%20mostru%C3%A1rio%20e%20gostaria%20de%20ajuda%20para%20escolher%20minha%20pe%C3%A7a." target="_blank" rel="noopener" class="floating-whatsapp-btn" aria-label="Atendimento no WhatsApp">
+      <i class="fa-brands fa-whatsapp"></i>
+      <span class="online-indicator"></span>
+    </a>
+  </aside>
+
+  <!-- Footer (Sem seção de administração conforme solicitado) -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="brand" style="margin-bottom: 12px;">
+            <div class="store-logo-box" id="footerStoreLogoBox">
+              <img id="footerStoreLogoImg" src="" alt="Logo da Loja" class="store-logo-img">
+              <span id="footerStoreLogoFallback" class="store-logo-fallback">M</span>
+            </div>
+            <div class="brand-title" id="footerStoreTitle" style="color: #fff;">Mostruário Oficial</div>
+          </div>
+          <p class="footer-desc" id="footerStoreDesc">
+            Mostruário completo de roupas em geral com corte de alfaiataria, streetwear e moda casual. Atendimento consultivo e personalizado direto no seu WhatsApp.
+          </p>
+        </div>
+        <div>
+          <h4 class="footer-col-title">Atendimento Direto</h4>
+          <div class="footer-contact-item">
+            <i class="fa-brands fa-whatsapp"></i>
+            <span>+55 (27) 99203-6558</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-clock" style="color: var(--accent);"></i>
+            <span>Seg a Sáb: 08h às 19h</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-shield-halved" style="color: var(--accent);"></i>
+            <span>Compra 100% Segura & Garantida</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>&copy; 2026 <span id="footerCopyrightStoreName">Mostruário Oficial</span>. Todos os direitos reservados.</div>
+        <div>WhatsApp Comercial: +55 (27) 99203-6558</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Container de Toasts para Notificações -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Script Principal -->
+  <script src="main.js"></script>
+</body>
+</html>

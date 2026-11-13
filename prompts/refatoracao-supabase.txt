@@ -100,15 +100,20 @@ Ao executar a migração, você **DEVE OBRIGATORIAMENTE** seguir estas diretrize
     }
   }
   ```
-  3. No `vercel.json` da raiz (sem outputDirectory, usando a pasta `public` nativa):
-  ```json
-  {
-    "version": 2,
-    "rewrites": [
-      { "source": "/api/(.*)", "destination": "/api" },
-      { "source": "/admin", "destination": "/admin/login.html" }
-    ]
-  }
+  3. No `api/src/server.js`, configure o Express para servir o front-end estático e reserve o health check exclusivamente para `/api`:
+  ```javascript
+  // Servir arquivos estáticos
+  const localPublic = path.resolve(__dirname, '../public');
+  const rootPublic = path.resolve(__dirname, '../../public');
+  const rootSite = path.resolve(__dirname, '../../site');
+  const staticPath = fs.existsSync(localPublic) ? localPublic : (fs.existsSync(rootPublic) ? rootPublic : rootSite);
+
+  app.use(express.static(staticPath));
+  app.use('/admin', express.static(path.join(staticPath, 'admin')));
+
+  app.get('/', (req, res) => res.sendFile(path.join(staticPath, 'index.html')));
+  app.get('/admin', (req, res) => res.sendFile(path.join(staticPath, 'admin/login.html')));
+  app.get('/api', (req, res) => res.json({ status: 'online' }));
   ```
 
 ---

@@ -2,15 +2,16 @@ import fs from 'fs';
 import path from 'path';
 
 const srcDir = path.resolve('site');
-const destDir = path.resolve('public');
+const destPublic = path.resolve('public');
+const destApiPublic = path.resolve('api/public');
 
 console.log('📦 Preparando arquivos estáticos para o deploy na Vercel...');
 
-if (fs.existsSync(destDir)) {
-    fs.rmSync(destDir, { recursive: true, force: true });
-}
+[destPublic, destApiPublic].forEach(dest => {
+    if (fs.existsSync(dest)) {
+        fs.rmSync(dest, { recursive: true, force: true });
+    }
+    fs.cpSync(srcDir, dest, { recursive: true });
+});
 
-fs.cpSync(srcDir, destDir, { recursive: true });
-
-console.log('✅ Pasta public/ gerada com sucesso a partir de site/!');
-
+console.log('✅ Pastas public/ e api/public/ geradas com sucesso a partir de site/!');
