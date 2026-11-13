@@ -18,21 +18,21 @@ const PORT = process.env.PORT || 3000;
 
 const app = express();
 
-// Configuração de CORS para permitir requisições do front-end e Vercel
+// Configuração de CORS permissivo para front-end e Vercel
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Configuração para JSON nas requisições
+// Suporte a JSON nas requisições
 app.use(express.json());
 
 // Servir arquivos estáticos de upload
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Health check para testes
-app.get('/api', (request, response) => {
+app.get(['/api', '/'], (request, response) => {
     return response.json({
         status: 'online',
         mensagem: 'API do Mostruário conectada com sucesso ao Supabase!',
@@ -40,12 +40,20 @@ app.get('/api', (request, response) => {
     });
 });
 
+// Rotas registradas com e sem prefixo /api para compatibilidade total em qualquer ambiente
 app.use('/api/categorias', categoriasRoutes);
-app.use('/api/produtos', produtoRouter);
-app.use('/api/usuarios', usuarioRouter);
-app.use('/api/lojas', lojasRouter);
+app.use('/categorias', categoriasRoutes);
 
-// Inicializa o servidor apenas quando não estiver rodando como serverless na Vercel
+app.use('/api/produtos', produtoRouter);
+app.use('/produtos', produtoRouter);
+
+app.use('/api/usuarios', usuarioRouter);
+app.use('/usuarios', usuarioRouter);
+
+app.use('/api/lojas', lojasRouter);
+app.use('/lojas', lojasRouter);
+
+// Inicializa o servidor apenas quando executado localmente (fora da Vercel)
 if (!process.env.VERCEL) {
     app.listen(PORT, () => {
         console.log(`🚀 A API está rodando em http://localhost:${PORT}/api`);
