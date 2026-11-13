@@ -73,24 +73,43 @@ Ao executar a migração, você **DEVE OBRIGATORIAMENTE** seguir estas diretrize
   export default app;
   ```
 
-### Regra 7: Estrutura Monorepo e Output Directory na Vercel (`STATIC_BUILD_NO_OUT_DIR` e `Cannot GET /`)
-- **Problema 1:** Ao rodar `npm run build` na raiz, a Vercel procura uma pasta de saída chamada `public`. Como o front-end está em `site/`, o build falha com `STATIC_BUILD_NO_OUT_DIR`.
-- **Problema 2:** Se existir um `api/vercel.json` com `/(.*)` -> `/index.js`, ele intercepta TODAS as requisições do site (inclusive `/` e assets estáticos) e envia para o Express, resultando em `Cannot GET /`.
-- **Problema 3:** Se o rewrite for para `"/api/index.js"`, o Express recebe a URL literal `"/index.js"`, resultando em `Cannot GET /index.js`.
-- **Solução:**
-  1. **Excluir qualquer `api/vercel.json`** interno.
-  2. No `vercel.json` da raiz, defina `"outputDirectory": "site"` e direcione `/api/(.*)` para `"/api"`:
+### Regra 7: Estrutura Monorepo e Arquivos Estáticos na Vercel (`public/` vs `outputDirectory`)
+- **Problema 1:** Se você configurar `"outputDirectory": "site"` em um projeto com preset Node.js, a Vercel tenta executar um servidor Node a partir da pasta `site/` e falha com o erro:
+  `No entrypoint found in output directory: "site". Searched for: - app.js, index.js, server.js...`
+- **Problema 2:** Se houver um script de build sem pasta de saída, a Vercel reclama de `STATIC_BUILD_NO_OUT_DIR` procurando por `public`.
+- **Solução Definitiva:**
+  1. Criar um script multiplataforma em `scripts/build.js` que sincroniza o conteúdo de `site/` para a pasta padrão `public/` esperada pela Vercel:
+  ```javascript
+  import fs from 'fs';
+  import path from 'path';
+
+  const srcDir = path.resolve('site');
+  const destDir = path.resolve('public');
+
+  if (fs.existsSync(destDir)) fs.rmSync(destDir, { recursive: true, force: true });
+  fs.cpSync(srcDir, destDir, { recursive: true });
+  ```
+  2. No `package.json` da raiz:
+  ```json
+  {
+    "type": "module",
+    "workspaces": ["api"],
+    "scripts": {
+      "build": "node scripts/build.js",
+      "start": "npm --prefix api start"
+    }
+  }
+  ```
+  3. No `vercel.json` da raiz (sem outputDirectory, usando a pasta `public` nativa):
   ```json
   {
     "version": 2,
-    "outputDirectory": "site",
     "rewrites": [
       { "source": "/api/(.*)", "destination": "/api" },
       { "source": "/admin", "destination": "/admin/login.html" }
     ]
   }
   ```
-  3. No `api/src/server.js`, registre as rotas com e sem o prefixo `/api` (ex: `app.use('/api/categorias', ...)` e `app.use('/categorias', ...)`), garantindo que a API responda independentemente de como o proxy encaminha o path.
 
 ---
 
